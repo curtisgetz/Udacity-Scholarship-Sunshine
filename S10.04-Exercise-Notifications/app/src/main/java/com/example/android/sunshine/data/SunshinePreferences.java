@@ -134,6 +134,11 @@ public final class SunshinePreferences {
         return preferredCoordinates;
     }
 
+
+
+
+
+
     /**
      * Returns true if the latitude and longitude values are available. The latitude and
      * longitude will not be available until the lesson where the PlacePicker API is taught.
@@ -154,6 +159,31 @@ public final class SunshinePreferences {
 
         return spContainBothLatitudeAndLongitude;
     }
+
+    public static boolean areNotificationsEnabled(Context context) {
+        /* Key for accessing the preference for showing notifications */
+        String displayNotificationsKey = context.getString(R.string.pref_enable_notifications_key);
+
+        /*
+         * In Sunshine, the user has the ability to say whether she would like notifications
+         * enabled or not. If no preference has been chosen, we want to be able to determine
+         * whether or not to show them. To do this, we reference a bool stored in bools.xml.
+         */
+        boolean shouldDisplayNotificationsByDefault = context
+                .getResources()
+                .getBoolean(R.bool.show_notifications_default);
+
+        /* As usual, we use the default SharedPreferences to access the user's preferences */
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+
+        /* If a value is stored with the key, we extract it here. If not, use a default. */
+        boolean shouldDisplayNotifications = sharedPref
+                .getBoolean(displayNotificationsKey, shouldDisplayNotificationsByDefault);
+
+        return shouldDisplayNotifications;
+    }
+
+
 
     /**
      * Returns the last time that a notification was shown (in UNIX time)

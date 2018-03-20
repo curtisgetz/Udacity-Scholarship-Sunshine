@@ -15,20 +15,64 @@
  */
 package com.example.android.sunshine.sync;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.util.Log;
+
+import com.example.android.sunshine.data.WeatherContract;
 
 
 public class SunshineSyncUtils {
 
-//  TODO (1) Declare a private static boolean field called sInitialized
+//   (1) Declare a private static boolean field called sInitialized
+    private static String TAG = SunshineSyncUtils.class.getSimpleName();
+    private static boolean sInitialized;
 
-    //  TODO (2) Create a synchronized public static void method called initialize
-    //  TODO (3) Only execute this method body if sInitialized is false
-    //  TODO (4) If the method body is executed, set sInitialized to true
-    //  TODO (5) Check to see if our weather ContentProvider is empty
-        //  TODO (6) If it is empty or we have a null Cursor, sync the weather now!
+    //   (2) Create a synchronized public static void method called initialize
+
+    synchronized public static void initialize(final Context context){
+        if(sInitialized) return;
+
+        sInitialized = true;
+
+        new AsyncTask<Void, Void, Void>() {
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                Log.v(TAG, "do-in-background");
+                Uri uriForecastQuery = WeatherContract.WeatherEntry.CONTENT_URI;
+
+                String[] projection = {WeatherContract.WeatherEntry._ID};
+                String selection = WeatherContract.WeatherEntry.getSqlSelectForTodayOnwards();
+
+                ContentResolver contentResolver =  context.getContentResolver();
+                Cursor forecastCursor = contentResolver.query(
+                        uriForecastQuery, projection, selection, null, null);
+
+                if(forecastCursor.getCount() == 0 || forecastCursor == null){
+                    Log.v(TAG, "Starting Immediate Sync");
+                    startImmediateSync(context);
+                }
+                forecastCursor.close();
+                return null;
+            }
+
+
+        }.execute();
+
+
+    }
+
+    //   (3) Only execute this method body if sInitialized is false
+
+    //   (4) If the method body is executed, set sInitialized to true
+    //   (5) Check to see if our weather ContentProvider is empty
+        //   (6) If it is empty or we have a null Cursor, sync the weather now!
 
     /**
      * Helper method to perform a sync immediately using an IntentService for asynchronous

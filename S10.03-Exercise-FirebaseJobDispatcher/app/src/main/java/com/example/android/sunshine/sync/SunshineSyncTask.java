@@ -18,6 +18,7 @@ package com.example.android.sunshine.sync;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.util.Log;
 
 import com.example.android.sunshine.data.WeatherContract;
 import com.example.android.sunshine.utilities.NetworkUtils;
@@ -27,6 +28,7 @@ import java.net.URL;
 
 public class SunshineSyncTask {
 
+    private final static String TAG = SunshineSyncUtils.class.getSimpleName();
 
     /**
      * Performs the network request for updated weather, parses the JSON from that request, and
@@ -77,7 +79,7 @@ public class SunshineSyncTask {
             }
 
             /* If the code reaches this point, we have successfully performed our sync */
-
+            Log.v(TAG, "-Sync Task Completed-");
         } catch (Exception e) {
             /* Server probably invalid */
             e.printStackTrace();
